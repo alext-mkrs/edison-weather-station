@@ -183,3 +183,6 @@ noble.on('discover', function processPeripheral(peripheral) {
     }
 });
 
+module.exports = {
+    getBleSensorModules: function() { return wsSensorModules; }
+}
