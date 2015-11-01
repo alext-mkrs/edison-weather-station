@@ -3,4 +3,4 @@ var webui = require("./web-ui/bin/www");
 
 console.log("Starting main app");
 
-setInterval(function() { console.log(blesensors.getBleSensorModules()) }, 5000);
+//setInterval(function() { console.log(blesensors.getBleSensorModules()) }, 5000);
