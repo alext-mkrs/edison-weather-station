@@ -168,6 +168,7 @@ noble.on('discover', function processPeripheral(peripheral) {
                 services.forEach(function(service) {
                     var serviceInfo = service.uuid;
 
+                    console.log("Discovered services and characteristics:");
                     if (service.name) {
                         serviceInfo += ' (' + service.name + ')';
                     }
