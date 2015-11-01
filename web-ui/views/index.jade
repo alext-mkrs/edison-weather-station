@@ -5,5 +5,9 @@ block content
   p Sensor data:
   ul
     each sensorModule in sensorModules
-      li= sensorModule
+      li Sensor module #{sensorModule.peripheral.id}:#{sensorModule.peripheral.advertisement.localName}
+        ul
+          li Temperature: #{sensorModule.temperature} degrees C
+          li Humidity: #{sensorModule.humidity} %
+
 
