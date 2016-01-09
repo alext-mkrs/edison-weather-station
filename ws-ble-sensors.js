@@ -28,11 +28,18 @@ function processTempSensorData(data, isNotification) {
         console.log("processTempSensorData(): data is null");
     }
 
+    message = this.peripheral.id +
+              "::" +
+              this.peripheral.advertisement.localName +
+              ": ";
+
     if (isNotification) {
-        message = "Temperature received by notification from module " + this.peripheral.id + ": ";
+        message = "Temperature received by notification from module " +
+                  message;
     }
     else {    
-        message = "Temperature initial value from module " + this.peripheral.id + ": ";
+        message = "Temperature initial value from module " +
+                  message;
     }
     
     wsSensorModules[this.peripheral.id].temperature = temperature;
@@ -50,11 +57,18 @@ function processHumSensorData(data, isNotification) {
         console.log("processHumSensorData(): data is null");
     }
 
+    message = this.peripheral.id +
+              "::" +
+              this.peripheral.advertisement.localName +
+              ": ";
+
     if (isNotification) {
-        message = "Humidity received by notification from module " + this.peripheral.id + ": ";
+        message = "Humidity received by notification from module " +
+                  message;
     }
     else {
-        message = "Humidity initial value from module " + this.peripheral.id + ": ";
+        message = "Humidity initial value from module " +
+                  message;
     }
 
     wsSensorModules[this.peripheral.id].humidity = humidity;
@@ -88,11 +102,11 @@ function processCharacteristics(error, characteristics) {
     if (tempCharacteristic && humCharacteristic && this.peripheral.advertisement.localName.indexOf(sensorModuleNamePattern) != -1) {
         console.log("Our sensor module found");
         if (!wsSensorModules[this.peripheral.id]) {
-            console.log("Adding peripheral " + this.peripheral.id + ":" + this.peripheral.advertisement.localName + " to the list");
+            console.log("Adding peripheral " + this.peripheral.id + "::" + this.peripheral.advertisement.localName + " to the list");
             wsSensorModules[this.peripheral.id] = { peripheral: this.peripheral };
         }
         else {
-            console.log("Peripheral " + this.peripheral.id + ":" + this.peripheral.advertisement.localName + " is already in the list");
+            console.log("Peripheral " + this.peripheral.id + "::" + this.peripheral.advertisement.localName + " is already in the list");
         }
 
         // setup read/notification callbacks.
@@ -168,19 +182,23 @@ noble.on('discover', function processPeripheral(peripheral) {
                 services.forEach(function(service) {
                     var serviceInfo = service.uuid;
 
-                    console.log("Discovered services and characteristics:");
+                    console.log("Discovered services and characteristics for " +
+                                peripheral.id +
+                                "::" +
+                                localName +
+                                ":");
                     if (service.name) {
                         serviceInfo += ' (' + service.name + ')';
                     }
                     console.log(serviceInfo);
                
-                    service.discoverCharacteristics([], processCharacteristics.bind({peripheral:peripheral}));
+                    service.discoverCharacteristics([], processCharacteristics.bind({ peripheral: peripheral }));
                 });
             });
         });
     }
     else {
-        console.log("Peripheral " + peripheral.id + " is already connected, skipping");
+        console.log("Peripheral " + peripheral.id + "::" + localName + " is already connected, skipping");
     }
 });
 
