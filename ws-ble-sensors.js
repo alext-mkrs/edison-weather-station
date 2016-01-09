@@ -1,5 +1,10 @@
 var noble = require('noble');
-var wsSensorModules = [];
+// Array of sensor data items
+// [0] - ambient temperature
+// [1] - humidity
+// TODO: devise better way than hard-assigning indexes (must work with Jade iteration)
+// Entry format: { name: "Temperature", value: 22.33, units: "degrees C" }
+var wsSensorData = [];
 
 var esServiceUuid = '181a';
 var tempCharacteristicUuid = '2a6e';
@@ -28,9 +33,9 @@ function processTempSensorData(data, isNotification) {
         console.log("processTempSensorData(): data is null");
     }
 
-    message = this.peripheral.id +
+    message = this.peripheral.advertisement.localName +
               "::" +
-              this.peripheral.advertisement.localName +
+              this.peripheral.id +
               ": ";
 
     if (isNotification) {
@@ -42,8 +47,8 @@ function processTempSensorData(data, isNotification) {
                   message;
     }
     
-    wsSensorModules[this.peripheral.id].temperature = temperature;
-    console.log(message + wsSensorModules[this.peripheral.id].temperature.toString());
+    wsSensorData[this.peripheral.id].sensors[0] = { name: "Temperature", value: temperature, units: "degrees C" }
+    console.log(message + wsSensorData[this.peripheral.id].sensors[0].value.toString());
 }
 
 function processHumSensorData(data, isNotification) {
@@ -57,9 +62,9 @@ function processHumSensorData(data, isNotification) {
         console.log("processHumSensorData(): data is null");
     }
 
-    message = this.peripheral.id +
+    message = this.peripheral.advertisement.localName +
               "::" +
-              this.peripheral.advertisement.localName +
+              this.peripheral.id +
               ": ";
 
     if (isNotification) {
@@ -71,8 +76,8 @@ function processHumSensorData(data, isNotification) {
                   message;
     }
 
-    wsSensorModules[this.peripheral.id].humidity = humidity;
-    console.log(message + wsSensorModules[this.peripheral.id].humidity.toString());
+    wsSensorData[this.peripheral.id].sensors[1] = { name: "Humidity", value: humidity, units: "%" }
+    console.log(message + wsSensorData[this.peripheral.id].sensors[1].value.toString());
 }
 
 function processCharacteristics(error, characteristics) {
@@ -101,12 +106,14 @@ function processCharacteristics(error, characteristics) {
     // If all characteristics found & name matches the pattern - we have "our" module
     if (tempCharacteristic && humCharacteristic && this.peripheral.advertisement.localName.indexOf(sensorModuleNamePattern) != -1) {
         console.log("Our sensor module found");
-        if (!wsSensorModules[this.peripheral.id]) {
-            console.log("Adding peripheral " + this.peripheral.id + "::" + this.peripheral.advertisement.localName + " to the list");
-            wsSensorModules[this.peripheral.id] = { peripheral: this.peripheral };
+        if (!wsSensorData[this.peripheral.id]) {
+            console.log("Adding peripheral " + this.peripheral.advertisement.localName + "::" + this.peripheral.id + " to the list");
+            wsSensorData[this.peripheral.id] = { moduleName: this.peripheral.advertisement.localName + "::" + this.peripheral.id,
+                                                 sensors: []
+                                               };
         }
         else {
-            console.log("Peripheral " + this.peripheral.id + "::" + this.peripheral.advertisement.localName + " is already in the list");
+            console.log("Peripheral " + this.peripheral.advertisement.localName + "::" + this.peripheral.id + " is already in the list");
         }
 
         // setup read/notification callbacks.
@@ -151,10 +158,13 @@ noble.on('discover', function processPeripheral(peripheral) {
     }
 
     peripheral.on('disconnect', function() {
-        console.log("Peripheral disconnect event");
+        console.log("Peripheral disconnect event: " +
+                    peripheral.advertisement.localName +
+                    "::" +
+                    peripheral.id);
         // remove the peripheral from the list to start off clean
-        if (wsSensorModules[peripheral.id]) {
-            delete wsSensorModules[peripheral.id];
+        if (wsSensorData[peripheral.id]) {
+            delete wsSensorData[peripheral.id];
         }
     });
 
@@ -162,7 +172,7 @@ noble.on('discover', function processPeripheral(peripheral) {
         console.log("Peripheral connect event");
     });
     
-    if (!wsSensorModules[peripheral.id]) { 
+    if (!wsSensorData[peripheral.id]) {
         // without this connection might not be established properly
         noble.stopScanning();
         peripheral.connect(function(error) {
@@ -183,9 +193,9 @@ noble.on('discover', function processPeripheral(peripheral) {
                     var serviceInfo = service.uuid;
 
                     console.log("Discovered services and characteristics for " +
-                                peripheral.id +
-                                "::" +
                                 localName +
+                                "::" +
+                                peripheral.id +
                                 ":");
                     if (service.name) {
                         serviceInfo += ' (' + service.name + ')';
@@ -198,10 +208,10 @@ noble.on('discover', function processPeripheral(peripheral) {
         });
     }
     else {
-        console.log("Peripheral " + peripheral.id + "::" + localName + " is already connected, skipping");
+        console.log("Peripheral " + localName + "::" + peripheral.id + " is already connected, skipping");
     }
 });
 
 module.exports = {
-    getBleSensorModules: function() { return wsSensorModules; }
+    getBleSensorData: function() { return wsSensorData; }
 }

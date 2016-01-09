@@ -3,4 +3,8 @@ var webui = require("./web-ui/bin/www");
 
 console.log("Starting main app");
 
-//setInterval(function() { console.log(blesensors.getBleSensorModules()) }, 5000);
+process.on('SIGINT', function() {
+    console.log("Caught interrupt signal, exiting");
+    process.exit();
+});
+
