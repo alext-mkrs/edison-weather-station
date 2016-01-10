@@ -3,7 +3,7 @@ var router = express.Router();
 
 var bleSensors = require("../../ws-ble-sensors.js");
 
-// Utility function to get sensor data array
+// Utility function to get sensor data array from data acquisition module
 function getSensorData() {
   var sensorDataAssoc = bleSensors.getBleSensorData();
   var sensorData = [];

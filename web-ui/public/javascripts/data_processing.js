@@ -1,106 +1,75 @@
-﻿var chart; // global
-var charts = [];
-
-var config = {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: [{
-            label: "Temperature",
-            data: [],
-            fill: false,
-            //borderDash: [5, 5],
-            borderColor: "rgba(200,0,0,1)",
-            backgroundColor: "rgba(200,0,0,1)",
-            pointBorderColor: "rgba(200,0,0,1)",
-            pointBackgroundColor: "rgba(200,0,0,1)",
-            pointBorderWidth: 1,
-            pointHoverRadius: 7,
-            yAxisID: "y-axis-temp1",
-        }, {
-            label: "Light intensity",
-            data: [],
-            fill: false,
-            //borderDash: [5, 5],
-            borderColor: "rgba(0,0,200,1)",
-            backgroundColor: "rgba(0,0,200,1)",
-            pointBorderColor: "rgba(0,0,200,1)",
-            pointBackgroundColor: "rgba(0,0,200,1)",
-            pointBorderWidth: 1,
-            pointHoverRadius: 7,
-            yAxisID: "y-axis-light1",
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        tooltips: {
-            mode: 'label',
-            backgroundColor: "rgba(0,0,0,0.3)",
-        },
-        hover: {
-            mode: 'label',
-        },
-        scales: {
-            xAxes: [{
-                display: true,
-                scaleLabel: {
-                    show: true,
-                    labelString: 'Time'
-                }
-            }],
-            yAxes: [{
-                id: "y-axis-temp1",
-                display: true,
-                position: "left",
-                type: "linear",
-                scaleLabel: {
-                    display: true,
-                    labelString: 'degrees C'
-                }
-            }, {
-                id: "y-axis-light1",
-                display: true,
-                position: "right",
-                type: "linear",
-                scaleLabel: {
-                    display: true,
-                    labelString: 'lux'
-                },
-                gridLines: {
-                    drawOnChartArea: false, // only want the grid lines for one axis
-                },
-                ticks: {
-                    beginAtZero: true,
-                    //suggestedMin: 0,
-                    //suggestedMax: 100,
-                }
-            }]
-        }
-    }
-};
+﻿var charts = [];
 
 /**
- * Request data from the server, add it to the graph and text part,
- * then set a timeout to request again
+ * Generates Chart.js chart config and options object given a sensor data entry
+ */
+function generateChartConfig(sensorDataItem) {
+    var config = {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: sensorDataItem['name'],
+                data: [],
+                fill: false,
+                //borderDash: [5, 5],
+                borderColor: "rgba(0,0,200,1)",
+                backgroundColor: "rgba(0,0,200,1)",
+                pointBorderColor: "rgba(0,0,200,1)",
+                pointBackgroundColor: "rgba(0,0,200,1)",
+                pointBorderWidth: 1,
+                pointHoverRadius: 7,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            tooltips: {
+                mode: 'label',
+                backgroundColor: "rgba(0,0,0,0.3)",
+            },
+            hover: {
+                mode: 'label',
+            },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        show: true,
+                        labelString: 'Time'
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    position: "left",
+                    type: "linear",
+                    scaleLabel: {
+                        display: true,
+                        labelString: sensorDataItem['units']
+                    }
+                }]
+            }
+        }
+    };
+
+    return config;
+}
+
+/**
+ * Main AJAX function, request sensor data from the server, updates text and charts,
+ * then sets a timeout to request again
  */
 function requestData() {
     // we'll request data from server after these many milliseconds
     var DATA_REQ_INTERVAL = 5000;
     $.ajax({
         url: 'get_sensor_data',
-        success: function(sensor_data_items) {
+        success: function(sensorDataItems) {
             // set values for textual sensor data representation
-            updateTextData(sensor_data_items);
-            
+            updateTextData(sensorDataItems);
+
             // create/update HTML elements for charts
-            updateChartElements(sensor_data_items);
-            
-            // create/update chart objects
-            updateCharts(sensor_data_items);
-            
-            // update charts
-            updateChartData(sensor_data_items);
+            updateChartElements(sensorDataItems);
 
             // call it again with an interval
             setTimeout(requestData, DATA_REQ_INTERVAL);
@@ -112,65 +81,118 @@ function requestData() {
 /**
  * This function updates text part of the data display
  */
-function updateTextData(sensor_data_items) {
+function updateTextData(sensorDataItems) {
     // clean up
     $('#sensor_data_items').empty();
 
     // outer loop for modules
-    for (var ii=0; ii < sensor_data_items['data'].length; ii++) {
-        $('<li id=sensor_module_' + ii + '/>').text(sensor_data_items['data'][ii]['moduleName']).appendTo('#sensor_data_items');
+    for (var ii=0; ii < sensorDataItems['data'].length; ii++) {
+        // line for a sensor module
+        $('<li id=sensor_module_' + ii + '/>').text(sensorDataItems['data'][ii]['moduleName'])
+                                              .appendTo('#sensor_data_items');
+        // list for sensor data items themselves
         $('#sensor_module_' + ii).append('<ul id=sensor_module_' + ii + '_data></ul>');
         // inner loop for sensors attached to a module
-        for (var jj=0; jj < sensor_data_items['data'][ii]['sensors'].length; jj++) {
-            $('<li/>').text(sensor_data_items['data'][ii]['sensors'][jj]['name'] +
+        for (var jj=0; jj < sensorDataItems['data'][ii]['sensors'].length; jj++) {
+            $('<li/>').text(sensorDataItems['data'][ii]['sensors'][jj]['name'] +
                             ": " +
-                            sensor_data_items['data'][ii]['sensors'][jj]['value'] +
+                            sensorDataItems['data'][ii]['sensors'][jj]['value'] +
                             " " +
-                            sensor_data_items['data'][ii]['sensors'][jj]['units']
-            ).appendTo('#sensor_module_' + ii + '_data');
+                            sensorDataItems['data'][ii]['sensors'][jj]['units'])
+                      .appendTo('#sensor_module_' + ii + '_data');
         }
     }
 }
 
 /**
  * This function creates/updates necessary HTML elements to hold our charts
+ * and Chart.js objects for charts themselves.
+ * Precondition: module and sensor names contain only alphanumeric symbols,
+ * exceptions are colon ':' and space ' ', which we remove.
  */
-function updateChartElements(sensor_data_items) {
-    $('#sensor_data_charts').empty();
-    // outer loop for modules
-    for (var ii=0; ii < sensor_data_items['data'].length; ii++) {
-        // add module-level div
-        var moduleLevelEltId = sensor_data_items['data'][ii]['moduleName'].replace(/:/g, '');
-        $('<div/>').attr('id', moduleLevelEltId)
-                   .appendTo('#sensor_data_charts');
-        // add module-level title
-        $('<h3/>').text(sensor_data_items['data'][ii]['moduleName'] + ' module charts')
-                  .appendTo('[id="' + moduleLevelEltId + '"]');
-        // inner loop for sensors attached to a module
-        for (var jj=0; jj < sensor_data_items['data'][ii]['sensors'].length; jj++) {
-            // add single sensor-level div
-            var sensorLevelEltId = (moduleLevelEltId +
-                                    "-" +
-                                    sensor_data_items['data'][ii]['sensors'][jj]['name']).replace(/ /g, '');
-            $('<div/>').attr('id', sensorLevelEltId)
-                       .appendTo('[id="' + moduleLevelEltId + '"]');
-            // add sensor-level title
-            $('<h4/>').text(sensor_data_items['data'][ii]['sensors'][jj]['name'] + ' sensor chart')
-                      .appendTo('[id="' + sensorLevelEltId + '"]');
-            // add single sensor-level legend container
-            var sensorLevelLegendEltId = (moduleLevelEltId +
-                                          "-" +
-                                          sensor_data_items['data'][ii]['sensors'][jj]['name'] +
-                                          "-legend").replace(/ /g, '');
-            $('<div/>').attr('id', sensorLevelLegendEltId)
-                       .appendTo('[id="' + sensorLevelEltId + '"]');
-            // add single sensor-level chart container
-            var sensorLevelCanvasEltId = (moduleLevelEltId +
-                                          "-" +
-                                          sensor_data_items['data'][ii]['sensors'][jj]['name'] +
-                                          "-canvas").replace(/ /g, '');
-            $('<canvas/>').attr({ id: sensorLevelCanvasEltId, style: 'width:100%;height:300px' })
-                          .appendTo('[id="' + sensorLevelEltId + '"]');
+function updateChartElements(sensorDataItems) {
+    // checking the number of sensor modules vs. number of charts, redraw if not equal
+    // TODO: what if an existing module goes out and one new goes in (i.e. the number is the same)?
+    if (sensorDataItems['data'].length != $('[id$="-module"]').length) {
+        // number of modules has changed
+        console.log("Number of modules has changed!");
+
+        // cleanup everything
+        // first HTML elements...
+        $('#sensor_data_charts').empty();
+        // ...then chart-related objects
+        for (var chartItem in charts) {
+            if (charts.hasOwnProperty(chartItem)) {
+                charts[chartItem].chart.destroy();
+                delete charts[chartItem];
+            }
+        }
+
+        // create HTML elements structure
+        // outer loop for modules
+        for (var ii=0; ii < sensorDataItems['data'].length; ii++) {
+            // add module-level div
+            var moduleName = sensorDataItems['data'][ii]['moduleName'];
+            var moduleLevelDivEltId = (moduleName.replace(/:| /g, '') + '-module');
+            $('<div/>').attr('id', moduleLevelDivEltId)
+                       .appendTo('#sensor_data_charts');
+            // add module-level title
+            $('<h3/>').text(moduleName + ' module charts')
+                      .appendTo('[id="' + moduleLevelDivEltId + '"]');
+            // inner loop for sensors attached to a module
+            for (var jj=0; jj < sensorDataItems['data'][ii]['sensors'].length; jj++) {
+                // add single sensor-level div
+                var sensorLevelDivEltId = (moduleLevelDivEltId +
+                                           '-' +
+                                           sensorDataItems['data'][ii]['sensors'][jj]['name'] +
+                                           '-sensor').replace(/ /g, '');
+                $('<div/>').attr('id', sensorLevelDivEltId)
+                           .appendTo('[id="' + moduleLevelDivEltId + '"]');
+                // add sensor-level title
+                $('<h4/>').text(sensorDataItems['data'][ii]['sensors'][jj]['name'] + ' sensor chart')
+                          .appendTo('[id="' + sensorLevelDivEltId + '"]');
+                // add single sensor-level chart container
+                var sensorLevelChartDivEltId = (moduleLevelDivEltId +
+                                                '-' +
+                                                sensorDataItems['data'][ii]['sensors'][jj]['name'] +
+                                                '-chart').replace(/ /g, '');
+                $('<div/>').attr({ id: sensorLevelChartDivEltId, style: 'width:100%;height:150px' })
+                           .appendTo('[id="' + sensorLevelDivEltId + '"]');
+                // add single sensor-level chart canvas
+                var sensorLevelChartCanvasEltId = (moduleLevelDivEltId +
+                                                   '-' +
+                                                   sensorDataItems['data'][ii]['sensors'][jj]['name'] +
+                                                   '-canvas').replace(/ /g, '');
+                $('<canvas/>').attr('id', sensorLevelChartCanvasEltId)
+                              .appendTo('[id="' + sensorLevelChartDivEltId + '"]');
+
+                // generate chart objects
+                var config = generateChartConfig(sensorDataItems['data'][ii]['sensors'][jj]);
+                var ctx = $('[id="' + sensorLevelChartCanvasEltId + '"]').get(0).getContext("2d");;
+                var chart = new Chart(ctx, config);
+                // add objects to a global holder, to use elsewhere
+                charts[sensorLevelDivEltId] = { config: config, ctx: ctx, chart: chart };
+            }
+        }
+    } else {
+        // number of modules hasn't changed - just proceed with chart dataset updates.
+        // TODO: add logic for checking number of sensors per module.
+        // outer loop for modules
+        for (var ii=0; ii < sensorDataItems['data'].length; ii++) {
+            // inner loop for sensors attached to a module
+            for (var jj=0; jj < sensorDataItems['data'][ii]['sensors'].length; jj++) {
+                // construct the charts array key the same way we do in the creation part
+                // TODO: make this a common code (function?)
+                var moduleName = sensorDataItems['data'][ii]['moduleName'];
+                var moduleLevelDivEltId = (moduleName.replace(/:| /g, '') + '-module');
+                var sensorLevelDivEltId = (moduleLevelDivEltId +
+                                           '-' +
+                                           sensorDataItems['data'][ii]['sensors'][jj]['name'] +
+                                           '-sensor').replace(/ /g, '');
+                updateChartData(charts[sensorLevelDivEltId]['chart'],
+                                charts[sensorLevelDivEltId]['config'],
+                                sensorDataItems['data'][ii]['sensors'][jj]);
+            }
         }
     }
 }
@@ -178,59 +200,36 @@ function updateChartElements(sensor_data_items) {
 /**
  * This function updates chart part of the data display
  */
-function updateChartData(sensor_data_items) {
-    // we'll display these many points - each point is taken once per second
+function updateChartData(chart, chartConfig, sensorDataItem) {
+    // we'll display these many points
     var NUMBER_OF_POINTS_TO_DISPLAY = 15;
 
-    var temp_series = config.data.datasets[0],
-        temp_shift = temp_series.data.length > NUMBER_OF_POINTS_TO_DISPLAY;
+    var sensorDataSeries = chartConfig.data.datasets[0],
+        sensorDataShift = sensorDataSeries.data.length > NUMBER_OF_POINTS_TO_DISPLAY;
 
-    var light_series = config.data.datasets[1],
-        light_shift = light_series.data.length > NUMBER_OF_POINTS_TO_DISPLAY;
+    var labelSeries = chartConfig.data.labels,
+        labelShift = labelSeries.length > NUMBER_OF_POINTS_TO_DISPLAY;
 
-    var labels_series = config.data.labels,
-        labels_shift = labels_series.length > NUMBER_OF_POINTS_TO_DISPLAY;
-
-    // add the Temperature point with a timestamp
-    time = new Date();
-    if (temp_shift) {
-        temp_series.data.shift()
+    // add a sensor data point with a timestamp
+    var time = new Date();
+    if (sensorDataShift) {
+        sensorDataSeries.data.shift()
     }
-    temp_series.data.push(sensor_data_items['data'][0]['sensors'][0]['value']);
-
-    // add the Light intensity point with the same timestamp
-    if (light_shift) {
-        light_series.data.shift()
-    }
-    light_series.data.push(sensor_data_items['data'][0]['sensors'][1]['value']);
+    sensorDataSeries.data.push(sensorDataItem['value']);
 
     // add timestamp to Labels
-    if (labels_shift) {
-        labels_series.shift()
+    if (labelShift) {
+        labelSeries.shift()
     }
-    labels_series.push(time.toLocaleTimeString());
+    labelSeries.push(time.toLocaleTimeString());
 
     // update chart
-    chart.update()
-}
-
-function updateCharts(sensor_data_items) {
-
+    chart.update();
 }
 
 /**
- * This function updates chart legend
- */
-function updateLegend() {
-    $legendContainer = $('#legend_container');
-    $legendContainer.empty();
-    $legendContainer.append(chart.generateLegend());
-}
-
+* Triggers our utility functions after the page is ready
+*/
 $(document).ready(function() {
-    var ctx = document.getElementById("chart_canvas").getContext("2d");
-    chart = new Chart(ctx, config);
-
-    updateLegend();
     requestData();
 });
