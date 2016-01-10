@@ -31,6 +31,22 @@ While I started it just for myself to create a network of sensors at home,
 I believe this is a nice example demonstrating various features and aspects
 of both Edison and Arduino/Genuino 101, so I'm sharing it with a wider audience.
 
+Base module code
+================
+
+Base module code is written in JavaScript and is intended to be run on
+Node.js on Edison. `package.json` file contains all dependency data, so just
+run `npm install` in the `ws-base-module` directory and then start the data
+acquisition process and web interface by running `node main.js`.
+
+By default the web interface will be available at `http://<IP of your Edison>:3000`
+
+Sensor module code
+==================
+
+This is a standard Arduino sketch. You'll need to install one of the two DHT
+sensor libraries, see header of the sketch for details.
+
 Bill of materials
 =================
 
