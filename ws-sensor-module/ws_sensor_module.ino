@@ -26,6 +26,7 @@ const int indicatorPin = 13;
 // before uploading a sketch. Nothing should break if you don't do that, but
 // it will be harder for you to distinguish modules in the UI.
 // The format is "WsSensorModule<ANYTHING>", otherwise our base module won't accept it.
+// <ANYTHING> should be numbers and/or letters, no special symbols allowed.
 const char *moduleName = "WsSensorModule1";
 
 BLEPeripheral blePeripheral;
