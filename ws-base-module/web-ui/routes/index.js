@@ -1,17 +1,27 @@
 var express = require('express');
 var router = express.Router();
 
-var bleSensors = require("../../ws-ble-sensors.js");
+var bleSensors = require('../../ws-ble-sensors.js');
+var localSensors = require('../../ws-local-sensors.js');
 
 // Utility function to get sensor data array from data acquisition module
 function getSensorData() {
-  var sensorDataAssoc = bleSensors.getBleSensorData();
+  var bleSensorDataAssoc = bleSensors.getBleSensorData();
+  var localSensorDataAssoc = localSensors.getLocalSensorData();
   var sensorData = [];
 
   // creating another array is ugly, but there seems to be no way of iterating over assoc array in Jade
-  for (var sensorDataItem in sensorDataAssoc) {
-    if (sensorDataAssoc.hasOwnProperty(sensorDataItem)) {
-      sensorData.push(sensorDataAssoc[sensorDataItem]);
+  // first, let's add data from BLE sensors
+  for (var sensorDataItem in bleSensorDataAssoc) {
+    if (bleSensorDataAssoc.hasOwnProperty(sensorDataItem)) {
+      sensorData.push(bleSensorDataAssoc[sensorDataItem]);
+    }
+  }
+
+  // next, the local ones
+  for (sensorDataItem in localSensorDataAssoc) {
+    if (localSensorDataAssoc.hasOwnProperty(sensorDataItem)) {
+      sensorData.push(localSensorDataAssoc[sensorDataItem]);
     }
   }
 
