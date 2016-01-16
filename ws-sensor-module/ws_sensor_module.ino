@@ -8,12 +8,19 @@
 // Another one checked to work is https://github.com/RobTillaart/Arduino/tree/master/libraries/DHTstable
 #include "DHT.h"
 
+// This will enable additional debug output and signal LED.
+// Set to 1 to enable, 0 to disable.
+#define DEBUG 1
+
 // DHT sensor
 DHT dht;
 // DHT sensor's data pin
 const int dhtPin = 2;
+
+#if DEBUG
 // Pin with a LED to indicate BLE connection
 const int indicatorPin = 13;
+#endif
 
 // BLE name for our module - for now you need to manually set it for each module
 // before uploading a sketch. Nothing should break if you don't do that, but
@@ -31,7 +38,9 @@ BLEPeripheral blePeripheral;
 // Humidity characteristic UUID
 #define CHAR_UUID_HUMIDITY "2A6F"
 
+#if DEBUG
 #define LOG_SERIAL Serial
+#endif
 
 BLEService esSvc(SERVICE_UUID_ESS);
 
@@ -73,18 +82,22 @@ void updateSensorData()
     oldHum = essHum;
   }
 
+#if DEBUG
   LOG_SERIAL.println("Status\tHumidity (%)\tTemperature (C)");
   LOG_SERIAL.print(dht.getStatusString());
   LOG_SERIAL.print("\t");
   LOG_SERIAL.print(humidity, 2);
   LOG_SERIAL.print("\t\t");
   LOG_SERIAL.println(temperature, 2);
+#endif
 }
 
 void setup() {
+#if DEBUG
   Serial.begin(9600);
   // This will indicate when central is connected. Remove to conserve energy.
   pinMode(indicatorPin, OUTPUT);
+#endif
 
   setupSensors();
 
@@ -105,7 +118,10 @@ void setup() {
      advertising packets and will be visible to remote BLE central devices
      until it receives a new connection */
   blePeripheral.begin();
+
+#if DEBUG
   LOG_SERIAL.println("Bluetooth device active, waiting for connections...");
+#endif
 }
 
 void loop() {
@@ -113,19 +129,25 @@ void loop() {
 
   // If central has connected to us
   if (central) {
+
+#if DEBUG
     Serial.print("Connected to central: ");
     // Print the central's MAC address:
     Serial.println(central.address());
     // Turn on the LED to indicate the connection:
     digitalWrite(indicatorPin, HIGH);
+#endif
 
     // Update sensor data as long as central is connected
     while (central.connected()) {
       updateSensorData();
     }
+
+#if DEBUG
     // When the central disconnects, turn off the LED:
     digitalWrite(indicatorPin, LOW);
     Serial.print("Disconnected from central: ");
     Serial.println(central.address());
+#endif
   }
 }
