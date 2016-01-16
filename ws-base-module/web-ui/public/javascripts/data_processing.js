@@ -13,10 +13,10 @@ function generateChartConfig(sensorDataItem) {
                 data: [],
                 fill: false,
                 //borderDash: [5, 5],
-                borderColor: "rgba(0,0,200,1)",
-                backgroundColor: "rgba(0,0,200,1)",
-                pointBorderColor: "rgba(0,0,200,1)",
-                pointBackgroundColor: "rgba(0,0,200,1)",
+                borderColor: 'rgba(0,0,200,1)',
+                backgroundColor: 'rgba(0,0,200,1)',
+                pointBorderColor: 'rgba(0,0,200,1)',
+                pointBackgroundColor: 'rgba(0,0,200,1)',
                 pointBorderWidth: 1,
                 pointHoverRadius: 7,
             }]
@@ -26,7 +26,7 @@ function generateChartConfig(sensorDataItem) {
             maintainAspectRatio: false,
             tooltips: {
                 mode: 'label',
-                backgroundColor: "rgba(0,0,0,0.3)",
+                backgroundColor: 'rgba(0,0,0,0.3)',
             },
             hover: {
                 mode: 'label',
@@ -41,8 +41,8 @@ function generateChartConfig(sensorDataItem) {
                 }],
                 yAxes: [{
                     display: true,
-                    position: "left",
-                    type: "linear",
+                    position: 'left',
+                    type: 'linear',
                     scaleLabel: {
                         display: true,
                         labelString: sensorDataItem['units']
@@ -95,9 +95,9 @@ function updateTextData(sensorDataItems) {
         // inner loop for sensors attached to a module
         for (var jj=0; jj < sensorDataItems['data'][ii]['sensors'].length; jj++) {
             $('<li/>').text(sensorDataItems['data'][ii]['sensors'][jj]['name'] +
-                            ": " +
+                            ': ' +
                             sensorDataItems['data'][ii]['sensors'][jj]['value'] +
-                            " " +
+                            ' ' +
                             sensorDataItems['data'][ii]['sensors'][jj]['units'])
                       .appendTo('#sensor_module_' + ii + '_data');
         }
@@ -115,7 +115,7 @@ function updateChartElements(sensorDataItems) {
     // TODO: what if an existing module goes out and one new goes in (i.e. the number is the same)?
     if (sensorDataItems['data'].length != $('[id$="-module"]').length) {
         // number of modules has changed
-        console.log("Number of modules has changed!");
+        console.log('Number of modules has changed!');
 
         // cleanup everything
         // first HTML elements...
@@ -168,7 +168,7 @@ function updateChartElements(sensorDataItems) {
 
                 // generate chart objects
                 var config = generateChartConfig(sensorDataItems['data'][ii]['sensors'][jj]);
-                var ctx = $('[id="' + sensorLevelChartCanvasEltId + '"]').get(0).getContext("2d");;
+                var ctx = $('[id="' + sensorLevelChartCanvasEltId + '"]').get(0).getContext('2d');;
                 var chart = new Chart(ctx, config);
                 // add objects to a global holder, to use elsewhere
                 charts[sensorLevelDivEltId] = { config: config, ctx: ctx, chart: chart };

@@ -5,7 +5,7 @@ var noble = require('noble');
 //   sensors:
 //     [0] - ambient temperature
 //     [1] - humidity
-// Sensor entry format: { name: "Temperature", value: 22.33, units: "degrees C" }
+// Sensor entry format: { name: 'Temperature', value: 22.33, units: 'degrees C' }
 // TODO: devise better way than hard-assigning indexes (must work with Jade iteration)
 var wsSensorData = [];
 
@@ -17,70 +17,70 @@ var sensorModuleNamePattern = 'WsSensorModule';
 
 function startBleScan() {
     if (noble.state === 'poweredOn') {
-        console.log("Starting BLE scan");
+        console.log('Starting BLE scan');
         noble.startScanning([esServiceUuid], false);
-    } 
+    }
     else {
-        console.log("Cannot start scanning - Noble state is not poweredOn");
+        console.log('Cannot start scanning - Noble state is not poweredOn');
         noble.stopScanning();
     }
 }
 
 function processTempSensorData(data, isNotification) {
     var temperature = null;
-    var message = "";
+    var message = '';
 
     if (data) {
         temperature = (data.readInt16LE(0) / 100).toFixed(1);
     }
     else {
-        console.log("processTempSensorData(): data is null");
+        console.log('processTempSensorData(): data is null');
     }
 
     message = this.peripheral.advertisement.localName +
-              "::" +
+              '::' +
               this.peripheral.id +
-              ": ";
+              ': ';
 
     if (isNotification) {
-        message = "Temperature received by notification from module " +
+        message = 'Temperature received by notification from module ' +
                   message;
     }
-    else {    
-        message = "Temperature initial value from module " +
+    else {
+        message = 'Temperature initial value from module ' +
                   message;
     }
-    
-    wsSensorData[this.peripheral.id].sensors[0] = { name: "Temperature", value: temperature, units: "degrees C" }
+
+    wsSensorData[this.peripheral.id].sensors[0] = { name: 'Temperature', value: temperature, units: 'degrees C' }
     console.log(message + wsSensorData[this.peripheral.id].sensors[0].value);
 }
 
 function processHumSensorData(data, isNotification) {
     var humidity = null;
-    var message = "";
-    
+    var message = '';
+
     if (data) {
         humidity = (data.readUInt16LE(0) / 100).toFixed(1);
     }
     else {
-        console.log("processHumSensorData(): data is null");
+        console.log('processHumSensorData(): data is null');
     }
 
     message = this.peripheral.advertisement.localName +
-              "::" +
+              '::' +
               this.peripheral.id +
-              ": ";
+              ': ';
 
     if (isNotification) {
-        message = "Humidity received by notification from module " +
+        message = 'Humidity received by notification from module ' +
                   message;
     }
     else {
-        message = "Humidity initial value from module " +
+        message = 'Humidity initial value from module ' +
                   message;
     }
 
-    wsSensorData[this.peripheral.id].sensors[1] = { name: "Humidity", value: humidity, units: "%" }
+    wsSensorData[this.peripheral.id].sensors[1] = { name: 'Humidity', value: humidity, units: '%' }
     console.log(message + wsSensorData[this.peripheral.id].sensors[1].value);
 }
 
@@ -109,15 +109,15 @@ function processCharacteristics(error, characteristics) {
 
     // If all characteristics found & name matches the pattern - we have "our" module
     if (tempCharacteristic && humCharacteristic && this.peripheral.advertisement.localName.indexOf(sensorModuleNamePattern) != -1) {
-        console.log("Our sensor module found");
+        console.log('Our sensor module found');
         if (!wsSensorData[this.peripheral.id]) {
-            console.log("Adding peripheral " + this.peripheral.advertisement.localName + "::" + this.peripheral.id + " to the list");
-            wsSensorData[this.peripheral.id] = { moduleName: this.peripheral.advertisement.localName + "::" + this.peripheral.id,
+            console.log('Adding peripheral ' + this.peripheral.advertisement.localName + '::' + this.peripheral.id + ' to the list');
+            wsSensorData[this.peripheral.id] = { moduleName: this.peripheral.advertisement.localName + '::' + this.peripheral.id,
                                                  sensors: []
                                                };
         }
         else {
-            console.log("Peripheral " + this.peripheral.advertisement.localName + "::" + this.peripheral.id + " is already in the list");
+            console.log('Peripheral ' + this.peripheral.advertisement.localName + '::' + this.peripheral.id + ' is already in the list');
         }
 
         // setup read/notification callbacks.
@@ -132,23 +132,23 @@ function processCharacteristics(error, characteristics) {
         humCharacteristic.notify(true, function(error) { if (error) throw error; });
     }
     else {
-        console.log("Looks like this is not our sensor module, skipping");
+        console.log('Looks like this is not our sensor module, skipping');
     }
 }
 
 noble.on('stateChange', function(state) {
-    console.log("noble state change detected to: " + state);
+    console.log('noble state change detected to: ' + state);
     startBleScan();
 });
 
 // debug only
-noble.on('scanStart', function() { console.log("BLE scan started"); });
-noble.on('scanStop', function() { console.log("BLE scan stopped"); });
+noble.on('scanStart', function() { console.log('BLE scan started'); });
+noble.on('scanStop', function() { console.log('BLE scan stopped'); });
 
 
 noble.on('discover', function processPeripheral(peripheral) {
     console.log('Peripheral with ID ' + peripheral.id + ' found');
-    
+
     var advertisement = peripheral.advertisement;
     var localName = advertisement.localName;
     var serviceUuids = advertisement.serviceUuids;
@@ -162,9 +162,9 @@ noble.on('discover', function processPeripheral(peripheral) {
     }
 
     peripheral.on('disconnect', function() {
-        console.log("Peripheral disconnect event: " +
+        console.log('Peripheral disconnect event: ' +
                     peripheral.advertisement.localName +
-                    "::" +
+                    '::' +
                     peripheral.id);
         // remove the peripheral from the list to start off clean
         if (wsSensorData[peripheral.id]) {
@@ -173,9 +173,9 @@ noble.on('discover', function processPeripheral(peripheral) {
     });
 
     peripheral.on('connect', function() {
-        console.log("Peripheral connect event");
+        console.log('Peripheral connect event');
     });
-    
+
     if (!wsSensorData[peripheral.id]) {
         // without this connection might not be established properly
         noble.stopScanning();
@@ -196,23 +196,23 @@ noble.on('discover', function processPeripheral(peripheral) {
                 services.forEach(function(service) {
                     var serviceInfo = service.uuid;
 
-                    console.log("Discovered services and characteristics for " +
+                    console.log('Discovered services and characteristics for ' +
                                 localName +
-                                "::" +
+                                '::' +
                                 peripheral.id +
-                                ":");
+                                ':');
                     if (service.name) {
                         serviceInfo += ' (' + service.name + ')';
                     }
                     console.log(serviceInfo);
-               
+
                     service.discoverCharacteristics([], processCharacteristics.bind({ peripheral: peripheral }));
                 });
             });
         });
     }
     else {
-        console.log("Peripheral " + localName + "::" + peripheral.id + " is already connected, skipping");
+        console.log('Peripheral ' + localName + '::' + peripheral.id + ' is already connected, skipping');
     }
 });
 
