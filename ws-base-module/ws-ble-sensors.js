@@ -1,14 +1,18 @@
 var noble = require('noble');
-// Array of sensor data items
-// [0] - ambient temperature
-// [1] - humidity
+// Array (object/associative) of sensor data items
+// <BLE peripheral ID ("MAC")>:
+//   moduleName: <BLE local name>::<BLE peripheral ID ("MAC")>
+//   sensors:
+//     [0] - ambient temperature
+//     [1] - humidity
+// Sensor entry format: { name: "Temperature", value: 22.33, units: "degrees C" }
 // TODO: devise better way than hard-assigning indexes (must work with Jade iteration)
-// Entry format: { name: "Temperature", value: 22.33, units: "degrees C" }
 var wsSensorData = [];
 
 var esServiceUuid = '181a';
 var tempCharacteristicUuid = '2a6e';
 var humCharacteristicUuid = '2a6f';
+// This must be synchronized with the sensor module sketch
 var sensorModuleNamePattern = 'WsSensorModule';
 
 function startBleScan() {
