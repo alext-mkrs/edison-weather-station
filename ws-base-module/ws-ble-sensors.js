@@ -31,7 +31,7 @@ function processTempSensorData(data, isNotification) {
     var message = "";
 
     if (data) {
-        temperature = data.readInt16LE(0) / 100;
+        temperature = (data.readInt16LE(0) / 100).toFixed(1);
     }
     else {
         console.log("processTempSensorData(): data is null");
@@ -52,7 +52,7 @@ function processTempSensorData(data, isNotification) {
     }
     
     wsSensorData[this.peripheral.id].sensors[0] = { name: "Temperature", value: temperature, units: "degrees C" }
-    console.log(message + wsSensorData[this.peripheral.id].sensors[0].value.toString());
+    console.log(message + wsSensorData[this.peripheral.id].sensors[0].value);
 }
 
 function processHumSensorData(data, isNotification) {
@@ -60,7 +60,7 @@ function processHumSensorData(data, isNotification) {
     var message = "";
     
     if (data) {
-        humidity = data.readUInt16LE(0) / 100;
+        humidity = (data.readUInt16LE(0) / 100).toFixed(1);
     }
     else {
         console.log("processHumSensorData(): data is null");
@@ -81,7 +81,7 @@ function processHumSensorData(data, isNotification) {
     }
 
     wsSensorData[this.peripheral.id].sensors[1] = { name: "Humidity", value: humidity, units: "%" }
-    console.log(message + wsSensorData[this.peripheral.id].sensors[1].value.toString());
+    console.log(message + wsSensorData[this.peripheral.id].sensors[1].value);
 }
 
 function processCharacteristics(error, characteristics) {
