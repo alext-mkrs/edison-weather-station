@@ -90,7 +90,7 @@ function processCharacteristics(error, characteristics) {
 
     if (error) {
         this.peripheral.disconnect();
-        throw error;
+        console.error("An error occurred during disconnect: ", error);
     }
 
     characteristics.forEach(function(characteristic) {
@@ -184,13 +184,13 @@ noble.on('discover', function processPeripheral(peripheral) {
             startBleScan();
             if (error) {
                 peripheral.disconnect();
-                throw error;
+                console.error("An error occurred during connection: ", error);
             }
 
             peripheral.discoverServices([esServiceUuid], function(error, services) {
                 if (error) {
                     peripheral.disconnect();
-                    throw error;
+                    console.error("An error occurred during service discovery: ", error);
                 }
 
                 services.forEach(function(service) {
