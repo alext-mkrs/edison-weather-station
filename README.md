@@ -13,12 +13,12 @@ the following features supported:
 - [x] Displaying sensor data through a user interface (web)
 - [ ] Cloud upload for long-term preservation and analytics
 - [ ] Displaying weather forecast from the Internet aside the sensor data
-- [ ] Getting data from locally-attached sensors
-  - [ ] Barometric pressure sensor (BMP180)
-  - [ ] Temperature sensor (DHT-22/AM2302)
-  - [ ] Humidity sensor (DHT-22/AM2302)
+- [x] Getting data from locally-attached sensors
+  - [x] Barometric pressure + temperature sensor (BMP180)
+  - [x] Humidity + temperature sensor (HTU21D)
 
-Making AM2302 work with Edison on Arduino expansion board may be tricky, so we'll see.
+Making AM2302 work with Edison on Arduino expansion board was not possible,
+so I resorted to a pair of I2C sensors to cover necessary measurements.
 
 #### Sensor module (Arduino 101)
 - [x] Temperature sensor (DHT-22/AM2302)
@@ -52,9 +52,9 @@ Bill of materials
 
 - Intel(r) Edison with a Kit for Arduino (base module) - 1 pc
   - Generally speaking, a mini-breakout board would work too, but you need to
-    take care of voltage level translations for directly attached sensors,
-    which may be tricky.
+    take care of voltage level translations for directly attached sensors.
 - Arduino/Genuino 101 (sensor module) - 1 or more (depending on your needs)
 - DHT-22/AM2302 sensor - 1 per sensor module + 1 for the base module
 - BMP180 sensor - 1 pc (attached to base module)
+- HTU21D sensor - 1 pc (attached to base module)
 
