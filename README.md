@@ -52,9 +52,9 @@ Bill of materials
 
 - Intel(r) Edison with a Kit for Arduino (base module) - 1 pc
   - Generally speaking, a mini-breakout board would work too, but you need to
-    take care of voltage level translations for directly attached sensors.
+    take care of I2C voltage level translations for directly attached sensors.
 - Arduino/Genuino 101 (sensor module) - 1 or more (depending on your needs)
-- DHT-22/AM2302 sensor - 1 per sensor module + 1 for the base module
+- DHT-22/AM2302 sensor - 1 per sensor module
 - BMP180 sensor - 1 pc (attached to base module)
 - HTU21D sensor - 1 pc (attached to base module)
 
