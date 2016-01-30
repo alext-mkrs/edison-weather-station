@@ -7,7 +7,7 @@ var upm_bmpx8x = require('jsupm_bmpx8x');
 //   sensors:
 //     [0] - ambient temperature
 //     [1] - atmospheric pressure
-// Sensor entry format: { name: 'Temperature', value: 22.33, units: 'degrees C' }
+// Sensor entry format: { name: 'Temperature', value: '22.33', units: 'degrees C' }
 // TODO: devise better way than hard-assigning indexes (must work with Jade iteration)
 var wsSensorData = [];
 
