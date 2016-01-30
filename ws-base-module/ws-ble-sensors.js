@@ -60,7 +60,7 @@ function processHumSensorData(data, isNotification) {
     var message = '';
 
     if (data) {
-        humidity = (data.readUInt16LE(0) / 100).toFixed(1);
+        humidity = (data.readUInt16LE(0) / 100).toString();
     }
     else {
         console.log('processHumSensorData(): data is null');
