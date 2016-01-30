@@ -12,6 +12,7 @@
     "serve-favicon": "~2.3.0",
     "noble": ">=1.2.0",
     "mraa": ">=0.9.0",
-    "jsupm_bmpx8x": ">=0.4.1"
+    "jsupm_bmpx8x": ">=0.4.1",
+    "jsupm_htu21d": ">=0.4.1"
   }
 }
