@@ -18,8 +18,10 @@ var SENSOR_I2C_BUS_NUM = 0;
 var pressureSensor = new upm_bmpx8x.BMPX8X(SENSOR_I2C_BUS_NUM, upm_bmpx8x.ADDR);
 
 setInterval(function() {
-    var pressure = Math.round(pressureSensor.getPressure() / 100);
-    var temperature = (pressureSensor.getTemperature()).toFixed(1);
+    // Pressure accuracy for BMP180 is -4 to +2 hPa, so no sense to keep decimals
+    var pressure = Math.round(pressureSensor.getPressure() / 100).toString();
+    // Temperature accuracy for BMP180 is +-2 C, so no sense to keep decimals
+    var temperature = Math.round(pressureSensor.getTemperature()).toString();
 
     //debug only
     console.log('Local sensors: pressure = ' + pressure +
