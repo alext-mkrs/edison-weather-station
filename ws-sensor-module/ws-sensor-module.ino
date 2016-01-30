@@ -74,8 +74,11 @@ void updateSensorData()
   float temperature = dht.getTemperature();
   float humidity = dht.getHumidity();
   // BLE ESS has float data with 0.01 precision stored as ints
+  // Temperature accuracy for AM2302 is +-0.2 C, so let's keep decimals
   int16_t essTemp = temperature*100;
-  uint16_t essHum = humidity*100;
+  // Humidity accuracy for AM2305 is +-2% to +- 5% RH,
+  // so no sense in keeping decimals
+  uint16_t essHum = round(humidity)*100;
 
   // Update BLE characteristics if values changed
   if (essTemp != oldTemp) {
@@ -91,9 +94,9 @@ void updateSensorData()
   LOG_SERIAL.println("Status\tHumidity (%)\tTemperature (C)");
   LOG_SERIAL.print(dht.getStatusString());
   LOG_SERIAL.print("\t");
-  LOG_SERIAL.print(humidity, 2);
+  LOG_SERIAL.print(essHum / 100);
   LOG_SERIAL.print("\t\t");
-  LOG_SERIAL.println(temperature, 2);
+  LOG_SERIAL.println((float)essTemp / 100, 1);
 #endif
 }
 
