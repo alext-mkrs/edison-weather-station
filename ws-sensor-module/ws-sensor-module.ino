@@ -5,7 +5,8 @@
 //  word rawHumidity = 0;
 //  word rawTemperature = 0;
 //  word data = 0;
-// Another one checked to work is https://github.com/RobTillaart/Arduino/tree/master/libraries/DHTstable
+// Alternatively see this pull request I've submitted: https://github.com/markruys/arduino-DHT/pull/5
+// Another lib checked to work is https://github.com/RobTillaart/Arduino/tree/master/libraries/DHTstable
 #include "DHT.h"
 
 // This will enable additional debug output and signal LED.
@@ -27,6 +28,7 @@ const int indicatorPin = 13;
 // it will be harder for you to distinguish modules in the UI.
 // The format is "WsSensorModule<ANYTHING>", otherwise our base module won't accept it.
 // <ANYTHING> should be numbers and/or letters, no special symbols allowed.
+// TODO: make this runtime-configurable
 const char *moduleName = "WsSensorModule1";
 
 BLEPeripheral blePeripheral;
@@ -74,6 +76,8 @@ void updateSensorData()
   // BLE ESS has float data with 0.01 precision stored as ints
   int16_t essTemp = temperature*100;
   uint16_t essHum = humidity*100;
+
+  // Update BLE characteristics if values changed
   if (essTemp != oldTemp) {
     tempChar.setValue(essTemp);
     oldTemp = essTemp;
