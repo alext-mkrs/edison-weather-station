@@ -1,3 +1,7 @@
+/* This module contains very simple abstraction layer for all sensor types
+   we have (BLE and local)
+*/
+
 var WsSensors = function() {};
 
 // Utility function to get sensor data array from all data acquisition modules

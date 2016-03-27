@@ -8,11 +8,12 @@
     "debug": "~2.2.0",
     "express": "~4.13.1",
     "jade": "~1.11.0",
-    "morgan": "~1.6.1",
-    "serve-favicon": "~2.3.0",
-    "noble": ">=1.2.0",
-    "mraa": ">=0.9.0",
     "jsupm_bmpx8x": ">=0.4.1",
-    "jsupm_htu21d": ">=0.4.1"
+    "jsupm_htu21d": ">=0.4.1",
+    "morgan": "~1.6.1",
+    "mraa": ">=0.9.0",
+    "noble": "^1.2.0",
+    "request": "^2.69.0",
+    "serve-favicon": "~2.3.0"
   }
 }
