@@ -86,19 +86,19 @@ function updateTextData(sensorDataItems) {
     $('#sensor_data_items').empty();
 
     // outer loop for modules
-    for (var ii=0; ii < sensorDataItems['data'].length; ii++) {
+    for (var ii=0; ii < sensorDataItems['sensorData'].length; ii++) {
         // line for a sensor module
-        $('<li id=sensor_module_' + ii + '/>').text(sensorDataItems['data'][ii]['moduleName'])
+        $('<li id=sensor_module_' + ii + '/>').text(sensorDataItems['sensorData'][ii]['moduleName'])
                                               .appendTo('#sensor_data_items');
         // list for sensor data items themselves
         $('#sensor_module_' + ii).append('<ul id=sensor_module_' + ii + '_data></ul>');
         // inner loop for sensors attached to a module
-        for (var jj=0; jj < sensorDataItems['data'][ii]['sensors'].length; jj++) {
-            $('<li/>').text(sensorDataItems['data'][ii]['sensors'][jj]['name'] +
+        for (var jj=0; jj < sensorDataItems['sensorData'][ii]['sensors'].length; jj++) {
+            $('<li/>').text(sensorDataItems['sensorData'][ii]['sensors'][jj]['name'] +
                             ': ' +
-                            sensorDataItems['data'][ii]['sensors'][jj]['value'] +
+                            sensorDataItems['sensorData'][ii]['sensors'][jj]['value'] +
                             ' ' +
-                            sensorDataItems['data'][ii]['sensors'][jj]['units'])
+                            sensorDataItems['sensorData'][ii]['sensors'][jj]['units'])
                       .appendTo('#sensor_module_' + ii + '_data');
         }
     }
@@ -113,7 +113,7 @@ function updateTextData(sensorDataItems) {
 function updateChartElements(sensorDataItems) {
     // checking the number of sensor modules vs. number of charts, redraw if not equal
     // TODO: what if an existing module goes out and one new goes in (i.e. the number is the same)?
-    if (sensorDataItems['data'].length != $('[id$="-module"]').length) {
+    if (sensorDataItems['sensorData'].length != $('[id$="-module"]').length) {
         // number of modules has changed
         console.log('Number of modules has changed!');
 
@@ -130,9 +130,9 @@ function updateChartElements(sensorDataItems) {
 
         // create HTML elements structure
         // outer loop for modules
-        for (var ii=0; ii < sensorDataItems['data'].length; ii++) {
+        for (var ii=0; ii < sensorDataItems['sensorData'].length; ii++) {
             // add module-level div
-            var moduleName = sensorDataItems['data'][ii]['moduleName'];
+            var moduleName = sensorDataItems['sensorData'][ii]['moduleName'];
             var moduleLevelDivEltId = (moduleName.replace(/:| /g, '') + '-module');
             $('<div/>').attr('id', moduleLevelDivEltId)
                        .appendTo('#sensor_data_charts');
@@ -140,34 +140,34 @@ function updateChartElements(sensorDataItems) {
             $('<h3/>').text(moduleName + ' module charts')
                       .appendTo('[id="' + moduleLevelDivEltId + '"]');
             // inner loop for sensors attached to a module
-            for (var jj=0; jj < sensorDataItems['data'][ii]['sensors'].length; jj++) {
+            for (var jj=0; jj < sensorDataItems['sensorData'][ii]['sensors'].length; jj++) {
                 // add single sensor-level div
                 var sensorLevelDivEltId = (moduleLevelDivEltId +
                                            '-' +
-                                           sensorDataItems['data'][ii]['sensors'][jj]['name'] +
+                                           sensorDataItems['sensorData'][ii]['sensors'][jj]['name'] +
                                            '-sensor').replace(/ /g, '');
                 $('<div/>').attr('id', sensorLevelDivEltId)
                            .appendTo('[id="' + moduleLevelDivEltId + '"]');
                 // add sensor-level title
-                $('<h4/>').text(sensorDataItems['data'][ii]['sensors'][jj]['name'] + ' sensor chart')
+                $('<h4/>').text(sensorDataItems['sensorData'][ii]['sensors'][jj]['name'] + ' sensor chart')
                           .appendTo('[id="' + sensorLevelDivEltId + '"]');
                 // add single sensor-level chart container
                 var sensorLevelChartDivEltId = (moduleLevelDivEltId +
                                                 '-' +
-                                                sensorDataItems['data'][ii]['sensors'][jj]['name'] +
+                                                sensorDataItems['sensorData'][ii]['sensors'][jj]['name'] +
                                                 '-chart').replace(/ /g, '');
                 $('<div/>').attr({ id: sensorLevelChartDivEltId, style: 'width:100%;height:150px' })
                            .appendTo('[id="' + sensorLevelDivEltId + '"]');
                 // add single sensor-level chart canvas
                 var sensorLevelChartCanvasEltId = (moduleLevelDivEltId +
                                                    '-' +
-                                                   sensorDataItems['data'][ii]['sensors'][jj]['name'] +
+                                                   sensorDataItems['sensorData'][ii]['sensors'][jj]['name'] +
                                                    '-canvas').replace(/ /g, '');
                 $('<canvas/>').attr('id', sensorLevelChartCanvasEltId)
                               .appendTo('[id="' + sensorLevelChartDivEltId + '"]');
 
                 // generate chart objects
-                var config = generateChartConfig(sensorDataItems['data'][ii]['sensors'][jj]);
+                var config = generateChartConfig(sensorDataItems['sensorData'][ii]['sensors'][jj]);
                 var ctx = $('[id="' + sensorLevelChartCanvasEltId + '"]').get(0).getContext('2d');;
                 var chart = new Chart(ctx, config);
                 // add objects to a global holder, to use elsewhere
@@ -178,20 +178,20 @@ function updateChartElements(sensorDataItems) {
         // number of modules hasn't changed - just proceed with chart dataset updates.
         // TODO: add logic for checking number of sensors per module.
         // outer loop for modules
-        for (var ii=0; ii < sensorDataItems['data'].length; ii++) {
+        for (var ii=0; ii < sensorDataItems['sensorData'].length; ii++) {
             // inner loop for sensors attached to a module
-            for (var jj=0; jj < sensorDataItems['data'][ii]['sensors'].length; jj++) {
+            for (var jj=0; jj < sensorDataItems['sensorData'][ii]['sensors'].length; jj++) {
                 // construct the charts array key the same way we do in the creation part
                 // TODO: make this a common code (function?)
-                var moduleName = sensorDataItems['data'][ii]['moduleName'];
+                var moduleName = sensorDataItems['sensorData'][ii]['moduleName'];
                 var moduleLevelDivEltId = (moduleName.replace(/:| /g, '') + '-module');
                 var sensorLevelDivEltId = (moduleLevelDivEltId +
                                            '-' +
-                                           sensorDataItems['data'][ii]['sensors'][jj]['name'] +
+                                           sensorDataItems['sensorData'][ii]['sensors'][jj]['name'] +
                                            '-sensor').replace(/ /g, '');
                 updateChartData(charts[sensorLevelDivEltId]['chart'],
                                 charts[sensorLevelDivEltId]['config'],
-                                sensorDataItems['data'][ii]['sensors'][jj]);
+                                sensorDataItems['sensorData'][ii]['sensors'][jj]);
             }
         }
     }

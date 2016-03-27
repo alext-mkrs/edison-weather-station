@@ -10,7 +10,7 @@ router.get('/', function(req, res, next) {
 
 // our micro-API endpoint for AJAX
 router.get('/get_sensor_data', function(req, res, next) {
-  res.send({ data: wsSensors.getSensorData() });
+  res.send({ sensorData: wsSensors.getSensorData() });
 });
 
 module.exports = router;
