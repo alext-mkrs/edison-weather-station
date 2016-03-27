@@ -25,7 +25,7 @@ so I resorted to a pair of I2C sensors to cover necessary measurements.
 - [x] Humidity sensor (DHT-22/AM2302)
 - [x] Battery-powered - per [my measurements](http://alextgalileo.altervista.org/blog/edison-wireless-weather-station-now-has-local-sensors/) it's not feasible to run all my modules off of the battery, but I'll do that with at least one, which is located in a place without wall socket nearby
 - [x] Exposing data through Bluetooth LE
-- [ ] ~Configurability through Bluetooth LE~ - I decided to drop this as it turned out I don't really need such a feature. Pull requests are welcome :smiley:
+- [ ] ~~Configurability through Bluetooth LE~~ - I decided to drop this as it turned out I don't really need such a feature. Pull requests are welcome :smiley:
 
 While I started it just for myself to create a network of sensors at home,
 I believe this is a nice example demonstrating various features and aspects
