@@ -25,7 +25,9 @@ var BLE_SCAN_STOP_INTERVAL = 35000;
 
 function startBleScan() {
     if (noble.state === 'poweredOn') {
-        console.log('Starting BLE scan');
+        if (process.env.NODE_ENV == 'development') {
+            console.log('Starting BLE scan');
+        }
         noble.startScanning([esServiceUuid], false);
     }
     else {
@@ -60,7 +62,9 @@ function processTempSensorData(data, isNotification) {
     }
 
     wsSensorData[this.peripheral.id].sensors[0] = { name: 'Temperature', value: temperature, units: 'degrees C' }
-    console.log(message + wsSensorData[this.peripheral.id].sensors[0].value);
+    if (process.env.NODE_ENV == 'development') {
+        console.log(message + wsSensorData[this.peripheral.id].sensors[0].value);
+    }
 }
 
 function processHumSensorData(data, isNotification) {
@@ -89,7 +93,9 @@ function processHumSensorData(data, isNotification) {
     }
 
     wsSensorData[this.peripheral.id].sensors[1] = { name: 'Humidity', value: humidity, units: '%' }
-    console.log(message + wsSensorData[this.peripheral.id].sensors[1].value);
+    if (process.env.NODE_ENV == 'development') {
+        console.log(message + wsSensorData[this.peripheral.id].sensors[1].value);
+    }
 }
 
 function processCharacteristics(error, characteristics) {
@@ -106,7 +112,9 @@ function processCharacteristics(error, characteristics) {
         if (characteristic.name) {
             characteristicInfo += ' (' + characteristic.name + ')';
         }
-        console.log('\t' + characteristicInfo);
+        if (process.env.NODE_ENV == 'development') {
+            console.log('\t' + characteristicInfo);
+        }
         if (characteristic.uuid == tempCharacteristicUuid) {
             tempCharacteristic = characteristic;
         }
@@ -117,7 +125,9 @@ function processCharacteristics(error, characteristics) {
 
     // If all characteristics found & name matches the pattern - we have "our" module
     if (tempCharacteristic && humCharacteristic && this.peripheral.advertisement.localName.indexOf(sensorModuleNamePattern) != -1) {
-        console.log('Our sensor module found');
+        if (process.env.NODE_ENV == 'development') {
+            console.log('Our sensor module found');
+        }
         if (!wsSensorData[this.peripheral.id]) {
             console.log('Adding peripheral ' + this.peripheral.advertisement.localName + '::' + this.peripheral.id + ' to the list');
             wsSensorData[this.peripheral.id] = { moduleName: this.peripheral.advertisement.localName + '::' + this.peripheral.id,
@@ -140,7 +150,9 @@ function processCharacteristics(error, characteristics) {
         humCharacteristic.notify(true, function(error) { if (error) throw error; });
     }
     else {
-        console.log('Looks like this is not our sensor module, skipping');
+        if (process.env.NODE_ENV == 'development') {
+            console.log('Looks like this is not our sensor module, skipping');
+        }
     }
 }
 
@@ -150,23 +162,28 @@ noble.on('stateChange', function(state) {
 });
 
 // debug only
-noble.on('scanStart', function() { console.log('BLE scan started'); });
-noble.on('scanStop', function() { console.log('BLE scan stopped'); });
-
+if (process.env.NODE_ENV == 'development') {
+    noble.on('scanStart', function() { console.log('BLE scan started'); });
+    noble.on('scanStop', function() { console.log('BLE scan stopped'); });
+}
 
 noble.on('discover', function processPeripheral(peripheral) {
-    console.log('Peripheral with ID ' + peripheral.id + ' found');
+    if (process.env.NODE_ENV == 'development') {
+        console.log('Peripheral with ID ' + peripheral.id + ' found');
+    }
 
     var advertisement = peripheral.advertisement;
     var localName = advertisement.localName;
     var serviceUuids = advertisement.serviceUuids;
 
-    if (localName) {
-        console.log('Local Name = ' + localName);
-    }
+    if (process.env.NODE_ENV == 'development') {
+        if (localName) {
+            console.log('Local Name = ' + localName);
+        }
 
-    if (localName) {
-        console.log('Service UUIDs = ' + serviceUuids);
+        if (serviceUuids) {
+            console.log('Service UUIDs = ' + serviceUuids);
+        }
     }
 
     peripheral.on('disconnect', function() {
@@ -180,9 +197,11 @@ noble.on('discover', function processPeripheral(peripheral) {
         }
     });
 
-    peripheral.on('connect', function() {
-        console.log('Peripheral connect event');
-    });
+    if (process.env.NODE_ENV == 'development') {
+        peripheral.on('connect', function() {
+            console.log('Peripheral connect event');
+        });
+    }
 
     if (!wsSensorData[peripheral.id]) {
         // without this connection might not be established properly
@@ -224,17 +243,19 @@ noble.on('discover', function processPeripheral(peripheral) {
 
 // This will scan for new modules every BLE_SCAN_START_INTERVAL ms.
 setInterval(function() {
-    console.log('starting periodic BLE module scan...');
+    if (process.env.NODE_ENV == 'development') {
+        console.log('starting periodic BLE module scan...');
+    }
     startBleScan();
-    console.log('...started periodic BLE module scan');
 }, BLE_SCAN_START_INTERVAL);
 
 // And this will stop scanning, every BLE_SCAN_STOP_INTERVAL, so effective scanning
 // window is (BLE_SCAN_STOP_INTERVAL - BLE_SCAN_START_INTERVAL) ms.
 setInterval(function() {
-        console.log('stopping BLE module scan...');
+        if (process.env.NODE_ENV == 'development') {
+            console.log('stopping BLE module scan...');
+        }
         noble.stopScanning();
-        console.log('...stopped BLE module scan');
 }, BLE_SCAN_STOP_INTERVAL);
 
 module.exports = {

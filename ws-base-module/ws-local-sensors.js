@@ -35,15 +35,17 @@ setInterval(function() {
     var temperature_htu21d = ((Math.round(humiditySensor.getTemperature(HTU21D_DONT_SAMPLE_DATA_FLAG) * 10)) / 10).toString();
 
     //debug only
-    console.log('Local sensors:' +
-                ' pressure (BMP180) = ' + pressure_bmp180 +
-                ' hPa,' +
-                ' temp. (BMP180) = ' + temperature_bmp180 +
-                ' deg. C,' +
-                ' comp. humidity (HTU21D) = ' + humidity_compensated_htu21d +
-                ' %, ' +
-                ' temp. (HTU21D) = ' + temperature_htu21d +
-                ' deg. C');
+    if (process.env.NODE_ENV == 'development') {
+        console.log('Local sensors:' +
+                    ' pressure (BMP180) = ' + pressure_bmp180 +
+                    ' hPa,' +
+                    ' temp. (BMP180) = ' + temperature_bmp180 +
+                    ' deg. C,' +
+                    ' comp. humidity (HTU21D) = ' + humidity_compensated_htu21d +
+                    ' %, ' +
+                    ' temp. (HTU21D) = ' + temperature_htu21d +
+                    ' deg. C');
+    }
 
     // construct outgoing data array, as this is a base module, we hardcode module name
     wsSensorData['LocalSensors'] = {

@@ -15,7 +15,16 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+if (app.get('env') === 'development') {
+    app.use(logger('dev'));
+} else {
+    // in production we want to skip everything, which is not an error
+    app.use(
+        logger('dev',
+               { skip: function(req, res) { return res.statusCode < 400 } }
+        )
+    );
+}
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

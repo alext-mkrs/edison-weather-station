@@ -49,6 +49,8 @@ The file assumes that you'll put the clone of this git repo
 to `/home/root/edison-weather-station` on your board, correct paths inside
 if that's not the case.
 
+To enable debug output, set `NODE_ENV` environment variable to `development`.
+
 Sensor module code
 ==================
 
