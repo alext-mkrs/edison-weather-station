@@ -11,7 +11,7 @@
 
 // This will enable additional debug output and signal LED.
 // Set to 1 to enable, 0 to disable.
-#define DEBUG 1
+#define DEBUG 0
 
 // DHT sensor
 DHT dht;
