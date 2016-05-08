@@ -41,6 +41,14 @@ acquisition process and web interface by running `node main.js`.
 
 By default the web interface will be available at `http://<IP of your Edison>:3000`
 
+`ws-base-module` dir contains a working Systemd service description file,
+`edison-weather-station.service`, to start weather station process automatically.
+
+Copy it to `/lib/systemd/system` and then run `systemctl enable edison-weather-station`.
+The file assumes that you'll put the clone of this git repo
+to `/home/root/edison-weather-station` on your board, correct paths inside
+if that's not the case.
+
 Sensor module code
 ==================
 

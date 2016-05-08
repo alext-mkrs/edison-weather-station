@@ -1,0 +1,14 @@
+[Unit]
+Description=edison-weather-station
+After=time-sync.target network-online.target
+
+[Service]
+Type=simple
+ExecStartPre=/usr/sbin/rfkill unblock bluetooth
+ExecStart=/usr/bin/node /home/root/edison-weather-station/ws-base-module/main.js
+User=root
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
