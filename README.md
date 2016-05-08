@@ -5,7 +5,7 @@ This repo contains code and assets for a wireless weather station project
 based on Intel(r) Edison (base module) and Arduino/Genuino 101 (wireless
 sensor modules).
 
-The project is yet work-in-progress, with the end-goal of having
+The project is mostly done, with the end-goal of having
 the following features supported:
 
 #### Base module (Edison)
@@ -30,6 +30,12 @@ so I resorted to a pair of I2C sensors to cover necessary measurements.
 While I started it just for myself to create a network of sensors at home,
 I believe this is a nice example demonstrating various features and aspects
 of both Edison and Arduino/Genuino 101, so I'm sharing it with a wider audience.
+
+Note that more than three sensor modules would force you to switch to 5GHz Wi-Fi for
+the base module. At least that was the case for me. With four modules Wi-Fi was breaking
+every now and then (both incoming and outgoing connections). My guess is interference
+between BT and 2.4GHz Wi-Fi, maybe due to the fact that both use the same band and standard
+built-in techniques do not work well with more than three modules connected.
 
 Base module code
 ================
