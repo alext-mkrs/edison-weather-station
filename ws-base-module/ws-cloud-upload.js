@@ -32,27 +32,33 @@ setInterval(function() {
         console.dir(sensorModule);
 
         var sensorModuleName = sensorModule['moduleName'];
-        var fieldCounter = 1;
-        // This is our set of sensor data converted to ThingSpeak format
-        var sensorDataSet = {};
-        // Iterate over sensor data entries
-        for (var j = 0; j < sensorModule['sensors'].length; j++) {
-            var sensorDataItem = sensorModule['sensors'][j];
+        if (cloudConfig.channelWriteKeys[sensorModuleName]) {
+            var fieldCounter = 1;
+            // This is our set of sensor data converted to ThingSpeak format
+            var sensorDataSet = {};
+            // Iterate over sensor data entries
+            for (var j = 0; j < sensorModule['sensors'].length; j++) {
+                var sensorDataItem = sensorModule['sensors'][j];
 
-            // Debug only
-            console.log('sensorDataItem:');
-            console.dir(sensorDataItem);
+                // Debug only
+                console.log('sensorDataItem:');
+                console.dir(sensorDataItem);
 
-            // Prepare field name
-            var fieldName = 'field' + fieldCounter;
-            // Set field value
-            sensorDataSet[fieldName] = sensorDataItem['value'];
-            fieldCounter++;
+                // Prepare field name
+                var fieldName = 'field' + fieldCounter;
+                // Set field value
+                sensorDataSet[fieldName] = sensorDataItem['value'];
+                fieldCounter++;
+            }
+            sensorDataSet['created_at'] = currDateTime.toISOString();
+            sensorDataForTspeak.push({'moduleName': sensorModuleName,
+                                      'writeKey': cloudConfig.channelWriteKeys[sensorModuleName],
+                                      'data': sensorDataSet});
+        } else {
+            console.log('ThingSpeak API write key is not defined for module "'
+                        + sensorModuleName
+                        + '", skipping its data');
         }
-        sensorDataSet['created_at'] = currDateTime.toISOString();
-        sensorDataForTspeak.push({'moduleName': sensorModuleName,
-                                  'writeKey': cloudConfig.channelWriteKeys[sensorModuleName],
-                                  'data': sensorDataSet});
     }
 
     // Debug only
