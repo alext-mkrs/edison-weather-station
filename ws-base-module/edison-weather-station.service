@@ -9,6 +9,7 @@ ExecStart=/usr/bin/node /home/root/edison-weather-station/ws-base-module/main.js
 User=root
 Restart=always
 RestartSec=10s
+Environment=NODE_ENV=production
 
 [Install]
 WantedBy=multi-user.target
