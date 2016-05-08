@@ -15,6 +15,14 @@ var humCharacteristicUuid = '2a6f';
 // This must be synchronized with the sensor module sketch
 var sensorModuleNamePattern = 'WsSensorModule';
 
+// We'll start BLE scan for new devices every these many milliseconds
+var BLE_SCAN_START_INTERVAL = 30000;
+// We'll *stop* BLE scan for new devices every these many milliseconds
+// Combined with the *START* one this will provide a window of opportunity for
+// new modules to get picked up without continuously scanning.
+var BLE_SCAN_STOP_INTERVAL = 35000;
+
+
 function startBleScan() {
     if (noble.state === 'poweredOn') {
         console.log('Starting BLE scan');
@@ -180,8 +188,6 @@ noble.on('discover', function processPeripheral(peripheral) {
         // without this connection might not be established properly
         noble.stopScanning();
         peripheral.connect(function(error) {
-            // start scanning to discover other modules
-            startBleScan();
             if (error) {
                 peripheral.disconnect();
                 console.error("An error occurred during connection: ", error);
@@ -215,6 +221,21 @@ noble.on('discover', function processPeripheral(peripheral) {
         console.log('Peripheral ' + localName + '::' + peripheral.id + ' is already connected, skipping');
     }
 });
+
+// This will scan for new modules every BLE_SCAN_START_INTERVAL ms.
+setInterval(function() {
+    console.log('starting periodic BLE module scan...');
+    startBleScan();
+    console.log('...started periodic BLE module scan');
+}, BLE_SCAN_START_INTERVAL);
+
+// And this will stop scanning, every BLE_SCAN_STOP_INTERVAL, so effective scanning
+// window is (BLE_SCAN_STOP_INTERVAL - BLE_SCAN_START_INTERVAL) ms.
+setInterval(function() {
+        console.log('stopping BLE module scan...');
+        noble.stopScanning();
+        console.log('...stopped BLE module scan');
+}, BLE_SCAN_STOP_INTERVAL);
 
 module.exports = {
     getBleSensorData: function() { return wsSensorData; }
