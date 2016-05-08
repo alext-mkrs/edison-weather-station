@@ -1,4 +1,4 @@
-#include <CurieBle.h>
+#include <CurieBLE.h>
 
 // DHT library I used is https://github.com/markruys/arduino-DHT
 // Change lines 145-147 in DHT.cpp to below, otherwise there will be garbage instead of actual values
