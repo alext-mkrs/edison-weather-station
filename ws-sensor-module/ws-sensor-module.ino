@@ -119,8 +119,7 @@ void setup() {
   blePeripheral.addAttribute(tempChar);
   blePeripheral.addAttribute(humChar);
   // Set initial values
-  tempChar.setValue(oldTemp);
-  humChar.setValue(oldHum);
+  updateSensorData();
 
   /* Now activate the BLE device.  It will start continuously transmitting BLE
      advertising packets and will be visible to remote BLE central devices
